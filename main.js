@@ -1,6 +1,7 @@
 import init from './sceneSetup.js'
 import {Wall} from './object.js'
 import {initControls, cameraMover} from './cameraControls.js'
+// import {estimate, loadNet} from './poseDetector.js'
 
 let {scene, camera, renderer, light} = init()
 let controls = initControls(camera, renderer)
@@ -21,11 +22,50 @@ console.log(scene)
 console.log(wall)
 
 
-renderer.setAnimationLoop( () => {
-  update()
+navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(
+  stream => {
+    let video = document.getElementById('video')
+    video.srcObject = stream
+    video.onloadedmetadata = e => {
+      video.play()
+    }
+  }
+)
 
-  renderer.render(scene, camera)
+
+const imageElement = document.getElementById('img');
+let n
+posenet.load().then(value => {
+  console.log(value)
+  n = value
+  start()
 })
+
+async function estimatePoseOnImage(imageElement) {
+  // load the posenet model from a checkpoint
+  // let n = await posenet.load()
+  const pose = await n.estimateSinglePose(imageElement, {
+    flipHorizontal: true
+  });
+  console.log(pose)
+  console.log(pose.keypoints[0].position.x)
+  wall.mesh.position.x = pose.keypoints[0].position.x
+  return pose;
+}
+
+let cpt = 0
+const start = () => {
+  renderer.setAnimationLoop( () => {
+    update()
+    cpt ++
+    if (cpt % 5 === 0) {
+
+      estimatePoseOnImage(imageElement)
+    }
+    renderer.render(scene, camera)
+  })
+}
+
 
 const update = () => {
   const delta = clock.getDelta()
@@ -33,7 +73,7 @@ const update = () => {
     mixer.update(delta)
   }
   moveCamera()
-  controls.update()
+  // controls.update()
   // light.position.x -= 0.01
 }
 

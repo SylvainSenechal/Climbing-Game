@@ -21,7 +21,7 @@ class Wall {
     }))
     // this.mesh.geometry.vertices = this.mesh.geometry.vertices.map(vertex => vertex)
     for (let vertex of this.mesh.geometry.vertices) {
-      console.log(vertex)
+      // console.log(vertex)
     }
   }
 }

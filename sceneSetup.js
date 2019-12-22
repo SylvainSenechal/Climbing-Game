@@ -1,5 +1,5 @@
 const nearView = 0.1
-const farView = 100
+const farView = 500
 const fieldOfView = 75
 
 const init = () => {

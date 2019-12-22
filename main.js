@@ -20,11 +20,16 @@ wall.mesh.position.y = 10
 camera.position.z = 25
 console.log(scene)
 console.log(wall)
-
-
-navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(
+// navigator.getUserMedia = navigator.getUserMedia ||
+//     navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+let video
+let w = 640
+let h = 480
+navigator.mediaDevices.getUserMedia({audio: false, video: {width: w, height: h}}).then(
   stream => {
-    let video = document.getElementById('video')
+    video = document.getElementById('video')
+    video.width = w
+    video.height = h
     video.srcObject = stream
     video.onloadedmetadata = e => {
       video.play()
@@ -35,21 +40,43 @@ navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(
 
 const imageElement = document.getElementById('img');
 let n
-posenet.load().then(value => {
+let argPoseNet = {
+  algorithm: 'Single-pose',
+  input: {
+    architecture: 'MobileNetV1',
+    outputStride: 16,
+    inputResolution: 500,
+    multiplier: 0.75,
+    quantBytes: 2
+  },
+  singlePosedetection: {
+    minPoseConfidence: 0.01,
+    minPartConfidence: 0.9
+  },
+  output: {
+    showVideo: true,
+    showPoints: true
+  }
+}
+posenet.load(argPoseNet).then(value => {
   console.log(value)
   n = value
   start()
 })
 
+let target = 0
 async function estimatePoseOnImage(imageElement) {
   // load the posenet model from a checkpoint
   // let n = await posenet.load()
-  const pose = await n.estimateSinglePose(imageElement, {
-    flipHorizontal: true
+  const pose = await n.estimateSinglePose(video, {
+    flipHorizontal: true,
+    decodingMethod: 'single-person'
   });
   console.log(pose)
   console.log(pose.keypoints[0].position.x)
-  wall.mesh.position.x = pose.keypoints[0].position.x
+  console.log(pose.keypoints[15].position.x)
+  target = pose.keypoints[0].position.x * 0.1
+  wall.mesh.position.x -= (wall.mesh.position.x - target*0.1)*0.75
   return pose;
 }
 
@@ -58,7 +85,7 @@ const start = () => {
   renderer.setAnimationLoop( () => {
     update()
     cpt ++
-    if (cpt % 5 === 0) {
+    if (cpt % 25 === 0) {
 
       estimatePoseOnImage(imageElement)
     }

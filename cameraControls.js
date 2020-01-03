@@ -1,10 +1,13 @@
 const initControls = (camera, renderer) => new THREE.OrbitControls(camera, renderer.domElement)
 
 let up, down, right, left
+const mouse = new THREE.Vector2()
 const MAX_SPEED = 3
 const ACCELERATION = 0.8
 let speedX = 0
 let speedY = 0
+
+
 document.onkeydown = event => {
 	if (event.keyCode == 90) up 	 = true
 	if (event.keyCode == 68) right = true
@@ -17,8 +20,15 @@ document.onkeyup = event => {
 	if (event.keyCode == 83) down  = false
 	if (event.keyCode == 81) left  = false
 }
+document.onmousemove = event => {
+	mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+	mouse.y = - (event.clientY / window.innerHeight) * 2 + 1
+	camera.rotateX(-event.movementY * 0.2 * Math.PI / 180)
+	camera.rotateY(-event.movementX * 0.2 * Math.PI / 180)
+	camera.rotation.z = 0
+}
 
-const cameraMover = camera => {
+const cameraMover = (camera) => {
   return () => {
     if (up    == true && speedY > - MAX_SPEED) speedY -= ACCELERATION
   	if (right == true && speedX < + MAX_SPEED) speedX += ACCELERATION

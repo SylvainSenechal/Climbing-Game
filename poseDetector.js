@@ -3,8 +3,8 @@ let target = 0
 
 let poseNetModel
 let video
-const WIDTH_VIDEO = 640
-const HEIGHT_VIDEO = 480
+const WIDTH_VIDEO = 1280
+const HEIGHT_VIDEO = 720
 
 const startCamera = () => {
   navigator.mediaDevices.getUserMedia({audio: false, video: {width: WIDTH_VIDEO, height: HEIGHT_VIDEO, frameRate: { max: 60 }}}).then(
@@ -50,16 +50,16 @@ const loadPoseNet = callback => {
 }
 
 
-const estimatePoseOnImage = async (wall) => {
+const estimatePoseOnImage = async () => {
   let pose = await poseNetModel.estimateSinglePose(video, {
     flipHorizontal: true,
     decodingMethod: 'single-person'
   })
-  console.log(pose)
+  // console.log(pose)
   // console.log(pose.keypoints[0].position.x)
   // console.log(pose.keypoints[15].position.x)
-  target = pose.keypoints[0].position.x * 0.1
-  wall.mesh.position.x -= (wall.mesh.position.x - target*0.1)*0.9
+  // target = pose.keypoints[0].position.x * 0.1
+  // wall.mesh.position.x -= (wall.mesh.position.x - target*0.1)*0.9
   drawPose(pose.keypoints)
 
   return pose
@@ -74,11 +74,19 @@ const drawPose = keypoints => {
   context.fillStyle = "#00ff00"
   for (let i = 0; i < 16; i++) {
     if (keypoints[i].score > 0.3) {
-      context.beginPath()
-      context.arc(keypoints[i].position.x, keypoints[i].position.y, 3, 0, 2*Math.PI)
-      context.fill()
+      // context.beginPath()
+      // context.arc(keypoints[i].position.x, keypoints[i].position.y, 6, 0, 2*Math.PI)
+      // context.fill()
     }
   }
+  context.fillStyle = "#ff0000"
+  context.beginPath()
+  context.arc(keypoints[9].position.x, keypoints[9].position.y, 6, 0, 2*Math.PI)
+  context.fill()
+  context.fillStyle = "#00ff00"
+  context.beginPath()
+  context.arc(keypoints[10].position.x, keypoints[10].position.y, 6, 0, 2*Math.PI)
+  context.fill()
 }
 
 export {loadPoseNet, startCamera, estimatePoseOnImage}

@@ -1,5 +1,5 @@
 const nearView = 0.1
-const farView = 500
+const farView = 1500
 const fieldOfView = 75
 
 const init = () => {
@@ -7,6 +7,7 @@ const init = () => {
   scene.background = new THREE.Color('skyblue')
 
   const camera = new THREE.PerspectiveCamera(fieldOfView, window.innerWidth / window.innerHeight, nearView, farView)
+  camera.rotation.order = 'YXZ'
 
   const renderer = new THREE.WebGLRenderer({antialias: true})
   renderer.physicallyCorrectLights = true

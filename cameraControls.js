@@ -6,6 +6,7 @@ const MAX_SPEED = 3
 const ACCELERATION = 0.8
 let speedX = 0
 let speedY = 0
+let targetAngleCamera = 0
 
 
 document.onkeydown = event => {
@@ -28,7 +29,7 @@ document.onmousemove = event => {
 	camera.rotation.z = 0
 }
 
-const cameraMover = (camera) => {
+const cameraMover = camera => {
   return () => {
     if (up    == true && speedY > - MAX_SPEED) speedY -= ACCELERATION
   	if (right == true && speedX < + MAX_SPEED) speedX += ACCELERATION
@@ -58,4 +59,13 @@ const cameraMover = (camera) => {
   }
 }
 
-export {initControls, cameraMover}
+const cameraTilter = camera => {
+	return angle => {
+		// targetAngleCamera = - angle
+		// camera.rotation.z += (targetAngleCamera - camera.rotation.z) * 0.05
+		// console.log(camera.rotation)
+
+	}
+}
+
+export {initControls, cameraMover, cameraTilter}

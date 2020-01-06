@@ -1,15 +1,21 @@
 import init from './sceneSetup.js'
-import {World, Plane} from './object.js'
-import {initControls, cameraMover} from './cameraControls.js'
+import {World, Debris, Plane} from './object.js'
+import {initControls, cameraMover, cameraTilter} from './cameraControls.js'
 import {loadPoseNet, startCamera, estimatePoseOnImage} from './poseDetector.js'
 
+document.onclick = e => {
+  let elem = document.getElementById("a"); // virer id a sur html
+  elem.requestPointerLock = elem.requestPointerLock    ||
+                           elem.mozRequestPointerLock
+  elem.requestPointerLock();
+}
 
 
 
-
-let {scene, camera, renderer, light} = init()
+let {scene, camera, renderer, light, ambientLight} = init()
 // let controls = initControls(camera, renderer)
 let moveCamera = cameraMover(camera)
+let tiltCamera = cameraTilter(camera)
 
 let g = new THREE.BoxGeometry(2, 2, 2)
 let mat = new THREE.MeshStandardMaterial({
@@ -43,13 +49,11 @@ const clock = new THREE.Clock();
 
 window.camera = camera
 
-
-// let sea = new Sea(scene)
-// let terrain = new Terrain(scene)
 let world = new World(scene)
 let plane = new Plane(scene)
-camera.position.z = 400
 
+camera.position.z = 500
+camera.position.y = 200
 let cpt = 0
 const start = () => {
   renderer.setAnimationLoop( () => {
@@ -59,21 +63,24 @@ const start = () => {
   })
 }
 
-let tiltAngle = 0
-
+let rollAngle = 0 // TODO: a mettre dans classe plane ?
+let pitchAngle = 0
 const update = async () => {
   const delta = clock.getDelta()
   world.moveWaves()
-  world.rotate()
+  world.rotate(plane, scene)
   for (let mixer of mixers) {
     mixer.update(delta)
   }
-  // m.skeleton.bones[0].rotation.x += 0.02
-  // m.skeleton.bones[0].rotation.y += 0.005
-  // obj.getObjectByName('epauleD').rotation.x += 0.01
-  // obj.getObjectByName('epauleD').getObjectByName('coudeD').rotation.x += 0.01
+  ambientLight.intensity += - ambientLight.intensity * 0.5
   moveCamera()
-  plane.tilt(tiltAngle)
+  tiltCamera(rollAngle)
+  plane.roll(rollAngle)
+  plane.pitch(pitchAngle)
+  plane.terrainCollisions(scene)
+  plane.debrisCollisions(world, scene, ambientLight)
+  world.refillListDebris()
+  world.moveParticules(scene)
   if (cpt % 1 === 0) {
     let pose = await estimatePoseOnImage()
 
@@ -93,18 +100,19 @@ const update = async () => {
   m1.position.y += (targetRightHandY - m1.position.y) * coil
   m2.position.x += (targetLeftHandX - m2.position.x) * coil
   m2.position.y += (targetLeftHandY - m2.position.y) * coil
+  pitchAngle = (m1.position.y + m2.position.y) / 2
   let dst = Math.sqrt((m1.position.x - m2.position.x)*(m1.position.x - m2.position.x) + (m1.position.y - m2.position.y)*(m1.position.y - m2.position.y))
   let dst2 = m1.position.x - m2.position.x
   if (dst > dst2) {
     // console.log('oui')
     // console.log(dst)
     // console.log(dst2)
-    tiltAngle = - Math.acos(dst2 / dst)
+    rollAngle = - Math.acos(dst2 / dst)
   } else {
     // console.log('non')
-    tiltAngle = 0
+    rollAngle = 0
   }
-  if (m1.position.y < m2.position.y) tiltAngle = - tiltAngle
+  if (m1.position.y < m2.position.y) rollAngle = - rollAngle
   // console.log(tiltAngle)
 
   // controls.update()
@@ -114,61 +122,6 @@ const update = async () => {
 startCamera()
 loadPoseNet(start)
 
-var bones = [];
-
-var shoulder = new THREE.Bone();
-var elbow = new THREE.Bone();
-var hand = new THREE.Bone();
-
-shoulder.add( elbow );
-elbow.add( hand );
-
-bones.push( shoulder );
-bones.push( elbow );
-bones.push( hand );
-
-shoulder.position.y = -5;
-elbow.position.y = 0;
-hand.position.y = 5;
-
-let geometry = new THREE.PlaneBufferGeometry(5, 5, 10, 10)
-let material = new THREE.MeshStandardMaterial({
-  color: 0x687282,
-  side: THREE.DoubleSide,
-  flatShading: true,
-  roughness: 0.5,
-  metalness: 0.1
-})
-
-let m
-let obj
-// let claviculeG, claviculeD
-// let brasG, brasD
-// let avantBrasG, avantBrasD
-let epauleG, coudeG, mainG
-loader.load( 'person.glb', gltf => {
-
-  obj = gltf.scene.getObjectByName("corps")
-  console.log(obj)
-  obj.rotation.y = -90
-  // avantBrasG = obj.skeleton.bones[3]
-  // brasG = obj.skeleton.bones[2]
-  // claviculeG = obj.skeleton.bones[1]
-
-  epauleG = obj.getObjectByName("epauleG")
-  coudeG = obj.getObjectByName("coudeG")
-  mainG = obj.getObjectByName("mainG")
-  scene.add(obj);
-
-  // m = obj.children[2]
-  // console.log(m.bones)
-  // console.log(m)
-  // let helper = new THREE.SkeletonHelper(obj)
-  // helper.material.linewidth = 3;
-  // scene.add(helper)
-}, undefined, error => {
-	console.error(error)
-}) // TODO: ADD LOADER %
 
 
 

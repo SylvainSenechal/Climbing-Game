@@ -4,7 +4,7 @@ let target = 0
 let poseNetModel
 let video
 const WIDTH_VIDEO = 1280
-const HEIGHT_VIDEO = 720
+export const HEIGHT_VIDEO = 720
 
 const startCamera = () => {
   navigator.mediaDevices.getUserMedia({audio: false, video: {width: WIDTH_VIDEO, height: HEIGHT_VIDEO, frameRate: { max: 60 }}}).then(

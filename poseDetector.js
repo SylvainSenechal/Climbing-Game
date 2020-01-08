@@ -25,19 +25,19 @@ const startCamera = () => {
 let argPoseNet = {
   algorithm: 'Single-pose',
   input: {
-    architecture: 'ResNet50',
-    outputStride: 16,
+    // architecture: 'ResNet50',
+    architecture: 'MobileNetV1',
+    // outputStride: 16,
+    outputStride: 32,
     inputResolution: {width: WIDTH_VIDEO, height: HEIGHT_VIDEO},
-    multiplier: 1.0,
-    quantBytes: 4
+    // multiplier: 1.0,
+    multiplier: 0.50,
+    // quantBytes: 4
+    quantBytes: 1
   },
   singlePosedetection: {
     minPoseConfidence: 0.01,
     minPartConfidence: 0.9
-  },
-  output: {
-    showVideo: true,
-    showPoints: true
   }
 }
 
@@ -55,11 +55,6 @@ const estimatePoseOnImage = async () => {
     flipHorizontal: true,
     decodingMethod: 'single-person'
   })
-  // console.log(pose)
-  // console.log(pose.keypoints[0].position.x)
-  // console.log(pose.keypoints[15].position.x)
-  // target = pose.keypoints[0].position.x * 0.1
-  // wall.mesh.position.x -= (wall.mesh.position.x - target*0.1)*0.9
   drawPose(pose.keypoints)
 
   return pose
@@ -71,14 +66,14 @@ context.canvas.width = WIDTH_VIDEO
 context.canvas.height = HEIGHT_VIDEO
 const drawPose = keypoints => {
   context.clearRect(0, 0, canvas.width, canvas.height)
-  context.fillStyle = "#00ff00"
-  for (let i = 0; i < 16; i++) {
-    if (keypoints[i].score > 0.3) {
-      // context.beginPath()
-      // context.arc(keypoints[i].position.x, keypoints[i].position.y, 6, 0, 2*Math.PI)
-      // context.fill()
-    }
-  }
+  // context.fillStyle = "#00ff00"
+  // for (let i = 0; i < 16; i++) {
+  //   if (keypoints[i].score > 0.3) {
+  //     context.beginPath()
+  //     context.arc(keypoints[i].position.x, keypoints[i].position.y, 6, 0, 2*Math.PI)
+  //     context.fill()
+  //   }
+  // }
   context.fillStyle = "#ff0000"
   context.beginPath()
   context.arc(keypoints[9].position.x, keypoints[9].position.y, 6, 0, 2*Math.PI)

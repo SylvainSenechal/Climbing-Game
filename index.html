@@ -9,7 +9,6 @@
 
     <script defer src="librairies/three.min.js"></script>
     <script defer src="librairies/OrbitControls.js"></script> <!-- TODO: remove if useless -->
-    <script defer src="librairies/GLTFLoader.js"></script> <!-- TODO: remove -->
         <!-- Load TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <!-- Load Posenet -->
@@ -43,6 +42,9 @@
         <div id="sliderBack">  </div>
         <div id="sliderFront">  </div>
       </div>
+    </div>
+    <div id="gameMenu">
+      start game
     </div>
   </body>
 </html>
@@ -98,5 +100,14 @@
   border-radius: 10px;
   /* left: 1px; */
   bottom: 6px;
+}
+
+#gameMenu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 500px;
+  height: 500px;
+
 }
 </style>

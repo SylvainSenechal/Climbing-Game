@@ -1,2 +1,3 @@
 # Climbing-Game
-Climb in Virtual reality with Unity &amp; Tensorflow
+Control an airplane with your body's position  
+Built with THREE.js & Tensorflow.js's posenet model

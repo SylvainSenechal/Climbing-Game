@@ -65,7 +65,7 @@ const estimatePoseOnImage = async () => {
   return pose
 }
 
-let canvas = document.getElementById('output')
+let canvas = document.getElementById('canvas')
 let context = canvas.getContext('2d')
 context.canvas.width = WIDTH_VIDEO
 context.canvas.height = HEIGHT_VIDEO

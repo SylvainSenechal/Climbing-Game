@@ -8,15 +8,15 @@
     <meta charset="utf-8">
 
     <script defer src="librairies/three.min.js"></script>
-    <script defer src="librairies/OrbitControls.js"></script>
-    <script defer src="librairies/GLTFLoader.js"></script>
+    <script defer src="librairies/OrbitControls.js"></script> <!-- TODO: remove if useless -->
+    <script defer src="librairies/GLTFLoader.js"></script> <!-- TODO: remove -->
         <!-- Load TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <!-- Load Posenet -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
     <script type="module" src="main.js" ></script>
   </head>
-  <body id='a'>
+  <body>
     <video id="video" playsinline style=" -moz-transform: scaleX(-1);
     -o-transform: scaleX(-1);
     -webkit-transform: scaleX(-1);
@@ -26,21 +26,77 @@
     opacity: 0;
     ">
     </video>
-    <canvas id="output" style="position: absolute; top: 0; left: 0; width: 1280px; height: 720px; z-index: 1;"></canvas>
+    <canvas id="canvas"></canvas>
+    <div id="gameInfos">
+      <div id="score">
+        <div> score </div>
+        <div id="scoreValue"> 0 </div>
+      </div>
 
+      <div id="fuel">
+        <div> fuel </div>
+        <div id="fuelValue"> 1000 </div>
+      </div>
+
+      <div id="condition">
+        <div> condition </div>
+        <div id="sliderBack">  </div>
+        <div id="sliderFront">  </div>
+      </div>
+    </div>
   </body>
 </html>
 
 <style>
 
 * {
-  /* box-sizing: border-box; */
+  box-sizing: border-box;
   overflow: hidden;
   margin: 0;
-  /* padding: 0; */
+  padding: 0;
   /* font-family: "Helvetica", "Arial", sans-serif; */
 }
-#img {
-  display: none;
+
+#canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1280px;
+  height: 720px;
+  z-index: 1;
+}
+
+#gameInfos {
+  position: absolute;
+  display: flex;
+}
+
+#gameInfos > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px;
+  padding: 5px;
+  text-transform: uppercase;
+  font-family: monospace;
+  font-weight: bolder;
+}
+
+#sliderBack {
+  width: 50px;
+  height: 8px;
+  /* 2e99f9 */
+  /* background: #c58787; */
+  border-radius: 3px;
+  border: solid 1px;
+}
+#sliderFront {
+  position: relative;
+  width: 46px;
+  height: 4px;
+  background: green;
+  border-radius: 10px;
+  /* left: 1px; */
+  bottom: 6px;
 }
 </style>

@@ -419,4 +419,4 @@ class Particule {
   }
 }
 
-export {World, Debris, Plane}
+export {World, Plane}

@@ -1,5 +1,5 @@
 import init from './sceneSetup.js'
-import {World, Debris, Plane} from './object.js'
+import {World, Plane} from './object.js'
 import {initControls, cameraMover, cameraTilter} from './cameraControls.js'
 import {loadPoseNet, startCamera, estimatePoseOnImage} from './poseDetector.js'
 
@@ -16,6 +16,10 @@ let {scene, camera, renderer, light, ambientLight} = init()
 // let controls = initControls(camera, renderer)
 let moveCamera = cameraMover(camera)
 let tiltCamera = cameraTilter(camera)
+let score = 0
+let fuel = 1000
+let divScore = document.getElementById("scoreValue")
+let divFuel = document.getElementById("fuelValue")
 
 let g = new THREE.BoxGeometry(2, 2, 2)
 let mat = new THREE.MeshStandardMaterial({
@@ -66,6 +70,10 @@ const start = () => {
 let rollAngle = 0 // TODO: a mettre dans classe plane ?
 let pitchAngle = 0
 const update = async () => {
+  score += 1
+  fuel -= 1
+  divScore.innerHTML = score
+  divFuel.innerHTML = fuel
   const delta = clock.getDelta()
   world.moveWaves()
   world.rotate(plane, scene)

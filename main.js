@@ -10,7 +10,6 @@ let tiltCamera = cameraTilter(camera)
 const player = {
   gameOn: false,
   score: 0,
-  fuel: 1000,
 }
 let divScore = document.getElementById("scoreValue")
 let divFuel = document.getElementById("fuelValue")
@@ -44,9 +43,9 @@ const start = () => {
 
 const updateMenuInfos = () => {
   player.score += 1
-  player.fuel -= 1
+  plane.fuel -= 1
   divScore.innerHTML = player.score
-  divFuel.innerHTML = player.fuel
+  divFuel.innerHTML = plane.fuel
 }
 
 let rollAngle = 0 // TODO: a mettre dans classe plane ?
@@ -65,6 +64,8 @@ const update = async () => {
   plane.terrainCollisions(scene)
   plane.debrisCollisions(world, scene, ambientLight)
   world.refillListDebris()
+  plane.fuelCollisions(world, scene, ambientLight)
+  world.refillListFuel()
   world.moveParticules(scene)
   if (cpt % 1 === 0) {
     let pose = await estimatePoseOnImage()

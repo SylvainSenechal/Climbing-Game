@@ -1,13 +1,14 @@
 import {HEIGHT_VIDEO} from './poseDetector.js'
 
-
 const SIZE_WORLD = 300
 const DETAILS_WORLD = 5
 const NB_CLOUDS = 200
 const OCTAVES = 3
 const NB_DEBRIS = 50
+const NB_FUEL = 50
 const NB_PARTICULES_ON_EXPLOSION = 10
 const PARTICULES_LIFESPAN = 20
+
 class World {
   constructor(scene) {
     this.terrain = new THREE.Group()
@@ -17,19 +18,21 @@ class World {
     this.listDebris = new THREE.Group()
     this.refillListDebris()
     this.listParticules = []
+    this.listFuel = new THREE.Group()
+    this.refillListFuel()
 
     this.terrain.add(this.sea.mesh)
     this.terrain.add(this.ground.mesh)
 
     scene.add(this.sky.clouds)
     scene.add(this.listDebris)
+    scene.add(this.listFuel)
     scene.add(this.terrain)
     this.terrain.name = "terrain"
   }
 
-  refillListDebris = () => {
-    Debris.fillListDebris(this.listDebris, NB_DEBRIS)
-  }
+  refillListDebris = () => Debris.fillListDebris(this.listDebris, NB_DEBRIS)
+  refillListFuel = () => Fuel.fillListFuel(this.listFuel, NB_FUEL)
 
   moveParticules = scene => {
     this.listParticules = this.listParticules.filter(particule => !particule.lifeCycle(scene))
@@ -49,9 +52,17 @@ class World {
     this.listDebris.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
     this.listDebris.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle)
 
+    this.listFuel.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
+    this.listFuel.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle)
+
     for (let particule of this.listParticules) {
       particule.pivot.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
       particule.pivot.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle)
+    }
+    for (let fuel of this.listFuel.children) {
+      fuel.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Math.random() * 0.02)
+      fuel.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 0.02)
+      fuel.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), Math.random() * 0.02)
     }
   }
 }
@@ -276,6 +287,7 @@ class Sky {
 
 class Plane {
   constructor(scene) {
+    this.fuel = 1000
     this.targetRollAngle = 0
     this.targetPitchAngle = 0
     this.raycaster = new THREE.Raycaster()
@@ -351,16 +363,25 @@ class Plane {
       let distance = debrisPosition.distanceTo(this.plane.position)
       if (distance < 150) {
         for (let i = 0; i < NB_PARTICULES_ON_EXPLOSION; i++) {
-          world.listParticules.push(new Particule(scene, debrisPosition))
+          world.listParticules.push(new Particule(scene, debrisPosition, "debris"))
         }
-        debris.material.color.set(0x0000ff)
         ambientLight.intensity = 2
-        // scene.remove(debris)
-        // debris.geometry.dispose()
-        // debris.material.dispose()
         world.listDebris.remove(debris)
-        console.log(world.listDebris.children.length)
+      }
+    }
+  }
 
+  fuelCollisions = (world, scene, ambientLight) => {
+    for (let fuel of world.listFuel.children) {
+      let fuelPosition = new THREE.Vector3()
+      fuel.getWorldPosition(fuelPosition)
+      let distance = fuelPosition.distanceTo(this.plane.position)
+      if (distance < 150) {
+        this.fuel += 300
+        for (let i = 0; i < NB_PARTICULES_ON_EXPLOSION; i++) {
+          world.listParticules.push(new Particule(scene, fuelPosition, "fuel"))
+        }
+        world.listFuel.remove(fuel)
       }
     }
   }
@@ -388,15 +409,44 @@ class Debris {
   }
 }
 
-class Particule {
-  constructor(scene, position) {
-    let materialParticules = new THREE.MeshStandardMaterial({
-      color: 0xff0000,
+class Fuel {
+  constructor() {
+    let materalFuel = new THREE.MeshStandardMaterial({
+      color: 0x00ff00,
       flatShading: true,
       roughness: 0.5,
       metalness: 0.2,
     })
-    let geometryParticules = new THREE.IcosahedronGeometry(SIZE_WORLD / 50, 1)
+    let geometryFuel = new THREE.TorusGeometry(SIZE_WORLD / 35, 2, 8, 12, Math.PI * 2)//(SIZE_WORLD / 35, 0)
+    let altitude = SIZE_WORLD * 1.5 + (- 0.5 + 2 * Math.random()) * SIZE_WORLD / 2
+    this.mesh = new THREE.Mesh(geometryFuel, materalFuel)
+    this.mesh.translateOnAxis(new THREE.Vector3(- 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2).normalize(), altitude)
+    this.rotationDirection = new THREE.Vector3(-1 + 2 * Math.random(), -1 + 2 * Math.random(), -1 + 2 * Math.random())
+  }
+  static fillListFuel = (listFuel, nbFuel) => {
+    let nbNewFuel = nbFuel - listFuel.children.length
+    for (let i = 0; i < nbNewFuel; i++) {
+      listFuel.add(new Fuel().mesh)
+    }
+  }
+}
+
+class Particule {
+  constructor(scene, position, type) {
+    let color = type === "debris" ? 0xff0000 : 0x00ff00
+    let materialParticules = new THREE.MeshStandardMaterial({
+      color: color,
+      flatShading: true,
+      roughness: 0.5,
+      metalness: 0.2,
+    })
+    let geometryParticules
+    if (type === "debris") {
+      geometryParticules = new THREE.IcosahedronGeometry(SIZE_WORLD / 50, 1)
+    } else {
+      geometryParticules = new THREE.OctahedronGeometry(SIZE_WORLD / 75, 0)
+    }
+
     this.mesh = new THREE.Mesh(geometryParticules, materialParticules)
     this.mesh.position.set(position.x + Math.random() * 15, position.y + Math.random() * 15, position.z + Math.random() * 15)
     this.direction = new THREE.Vector3(-1 + 2 * Math.random(), -1 + 2 * Math.random(), -1 + 2 * Math.random())

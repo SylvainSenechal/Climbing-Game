@@ -5,6 +5,7 @@ const DETAILS_WORLD = 5
 const NB_CLOUDS = 200
 const OCTAVES = 3
 const NB_DEBRIS = 50
+const COLLISION_DAMAGE = 19
 const NB_FUEL = 50
 const NB_PARTICULES_ON_EXPLOSION = 10
 const PARTICULES_LIFESPAN = 20
@@ -287,6 +288,7 @@ class Sky {
 
 class Plane {
   constructor(scene) {
+    this.condition = 100
     this.fuel = 1000
     this.targetRollAngle = 0
     this.targetPitchAngle = 0
@@ -342,7 +344,6 @@ class Plane {
   }
 
   terrainCollisions = scene => {
-
     let intersected = this.raycaster.intersectObjects(scene.children, true)
     for (let i = 0; i < intersected.length; i++) {
       if (intersected[i].object.name === "ground" || intersected[i].object.name === "sea") {
@@ -362,6 +363,7 @@ class Plane {
       debris.getWorldPosition(debrisPosition)
       let distance = debrisPosition.distanceTo(this.plane.position)
       if (distance < 150) {
+        this.condition = Math.max(this.condition - COLLISION_DAMAGE, 1)
         for (let i = 0; i < NB_PARTICULES_ON_EXPLOSION; i++) {
           world.listParticules.push(new Particule(scene, debrisPosition, "debris"))
         }

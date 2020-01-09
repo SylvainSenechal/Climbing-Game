@@ -26,25 +26,36 @@
     ">
     </video>
     <canvas id="canvas"></canvas>
-    <div id="gameInfos">
-      <div id="score">
-        <div> score </div>
-        <div id="scoreValue"> 0 </div>
-      </div>
+    <div id="container">
+      <div id="gameInfos">
+        <div id="score">
+          <div> score </div>
+          <div id="scoreValue"> 0 </div>
+        </div>
 
-      <div id="fuel">
-        <div> fuel </div>
-        <div id="fuelValue"> 1000 </div>
-      </div>
+        <div id="fuel">
+          <div> fuel </div>
+          <div id="fuelValue"> 1000 </div>
+        </div>
 
-      <div id="condition">
-        <div> Airplane condition </div>
-        <div id="sliderBack">  </div>
-        <div id="sliderFront">  </div>
+        <div id="condition">
+          <div> Airplane condition </div>
+          <div id="sliderBack">  </div>
+          <div id="sliderFront">  </div>
+        </div>
       </div>
-    </div>
-    <div id="gameMenu">
-      start game
+      <div id="gameMenu">
+        <div id="title"> The Human Airplane </div>
+        <button id="startGame"> New Game </button>
+        <div id="instructions">
+          <div id="titleInstructions"> instructions </div>
+          <div id="textInstructions">
+            <div> Tensorflow's posenet model detect keypoints on your body. You can control the airplane with it </div>
+            <div> Pitch the airplane with your hand altitude </div>
+            <div> Roll the airplane with your hands's altitude difference </div>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>
@@ -58,6 +69,15 @@
   /* font-family: "Helvetica", "Arial", sans-serif; */
 }
 
+#container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
 #canvas {
   position: absolute;
   top: 0;
@@ -68,8 +88,9 @@
 }
 
 #gameInfos {
-  position: absolute;
+  position: relative;
   display: flex;
+  margin-top: 15px;
 }
 
 #gameInfos > div {
@@ -102,11 +123,79 @@
 }
 
 #gameMenu {
-  position: absolute;
-  left: 50%;
-  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: 20%;
   width: 500px;
-  height: 500px;
+  height: 600px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+#title {
+  font-family: monospace;
+  font-size: 26px;
+  padding: 3px;
+  border-bottom: solid 1px #5a5454;
+  transform: translate(0px, -100px);
+}
+button {
+  all: unset;
+}
+#startGame {
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 1px 4px 3px 0px rgba(0,0,0,0.5);
+  padding: 10px;
+  margin: 10px;
+  width: 200px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 2;
+  border-radius: 10px;
+  transform: translate(0px, -90px);
+}
+#startGame:hover {
+  background: rgba(255, 100, 100, 0.85);
+}
+
+#titleInstructions {
+  box-shadow: 1px 4px 3px 0px rgba(0,0,0,0.5);
+  border-radius: 10px;
 
 }
+
+#instructions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 1px 4px 3px 0px rgba(0,0,0,0.5);
+  border-bottom: solid 1px #5a5454;
+  width: 250px;
+  border-radius: 10px;
+}
+#instructions > div {
+  padding: 5px;
+  margin: 5px;
+  text-align: center;
+}
+
+#textInstructions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#textInstructions > div {
+  box-shadow: 1px 4px 3px 0px rgba(0,0,0,0.5);
+  margin: 5px;
+  padding: 5px;
+  border-radius: 10px;
+}
+
 </style>

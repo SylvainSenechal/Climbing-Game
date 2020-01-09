@@ -13,11 +13,10 @@ const player = {
 }
 let divScore = document.getElementById("scoreValue")
 let divFuel = document.getElementById("fuelValue")
+let divAirplaneCondition = document.getElementById("sliderFront")
 
 let rightHand = {x: 0, y: 0}
 let leftHand = {x: 0, y: 0}
-
-
 let targetRightHandX = 0
 let targetRightHandY = 0
 let targetLeftHandX = 0
@@ -40,12 +39,13 @@ const start = () => {
     renderer.render(scene, camera)
   })
 }
-
 const updateMenuInfos = () => {
   player.score += 1
   plane.fuel -= 1
   divScore.innerHTML = player.score
   divFuel.innerHTML = plane.fuel
+  divAirplaneCondition.style.width = `${plane.condition * 1.06}px` // condition lifebar is 106px wide
+  divAirplaneCondition.style.background = `rgb(${255 - plane.condition * 2.55}, ${plane.condition * 2.55}, 0)`
 }
 
 let rollAngle = 0 // TODO: a mettre dans classe plane ?

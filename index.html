@@ -26,8 +26,14 @@
     ">
     </video>
     <canvas id="canvas"></canvas>
+    <div id="containerData">
+      <div> HeatMap hands position data </div>
+      <canvas id="canvasData"> </canvas>
+    </div>
     <div id="container">
       <div id="gameInfos">
+        <button id="data"> Game Data </button>
+        <button id="pause"> Pause Game </button>
         <div id="score">
           <div> score </div>
           <div id="scoreValue"> 0 </div>
@@ -198,4 +204,45 @@ button {
   border-radius: 10px;
 }
 
+#pause {
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 1px 4px 3px 0px rgba(0,0,0,0.5);
+  padding: 10px;
+  margin: 10px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 2;
+  border-radius: 10px;
+}
+
+#data {
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 1px 4px 3px 0px rgba(0,0,0,0.5);
+  padding: 10px;
+  margin: 10px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 2;
+  border-radius: 10px;
+}
+/* data */
+#containerData {
+  background-color: white;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 1280px;
+  height: 820px;
+  left: 50%;
+  top: 50%;
+  margin-left: -640px;
+  margin-top: -410px;
+  /* padding: 10px; */
+}
+
+#canvasData {
+  width: 1280px;
+  height: 720px;
+}
 </style>

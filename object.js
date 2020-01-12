@@ -150,7 +150,6 @@ class Ground {
       // this.mesh.geometry.vertices[i].y += - 3 + Math.random() * 6
       // this.mesh.geometry.vertices[i].z += - 3 + Math.random() * 6
     }
-    console.log(this.mesh.geometry)
     for (let i = 0; i < this.mesh.geometry.faces.length; i++) {
       let v1 = this.mesh.geometry.faces[i].a
       let v2 = this.mesh.geometry.faces[i].b
@@ -321,8 +320,9 @@ class Plane {
     scene.add(plane)
     plane.add(wings)
     // plane.rotateY(90 * Math.PI / 180)repartition
-    console.log(plane)
     this.plane = plane
+    this.plane.name = "plane"
+
     this.raycaster.set(this.plane.position, new THREE.Vector3(0, -1, 0))
   }
 
@@ -347,7 +347,6 @@ class Plane {
     let intersected = this.raycaster.intersectObjects(scene.children, true)
     for (let i = 0; i < intersected.length; i++) {
       if (intersected[i].object.name === "ground" || intersected[i].object.name === "sea") {
-        intersected[i].object.material.color.set(0xff0000)
         // console.log(intersected[i].object)
       }
       // intersected[i].object.position.y += 0.1

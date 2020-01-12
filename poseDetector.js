@@ -20,8 +20,6 @@ const startCamera = () => {
   )
 }
 
-
-
 let argPoseNet = {
   algorithm: 'Single-pose',
   input: {

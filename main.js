@@ -14,6 +14,12 @@ const gameStatus = {
   score: 0,
 }
 
+const CAMERA_Y_GAME_ON = 470
+const CAMERA_Z_GAME_ON = 100
+const CAMERA_Y_GAME_OFF = 300
+const CAMERA_Z_GAME_OFF = 800
+const CAMERA_ROTATION_GAME_OFF = - 0.27
+const CAMERA_ROTATION_GAME_ON = - 0.7
 let divScore = document.getElementById("scoreValue")
 let divFuel = document.getElementById("fuelValue")
 let divAirplaneCondition = document.getElementById("sliderFront")
@@ -25,6 +31,7 @@ let containerData = document.getElementById("containerData")
 buttonStart.onclick = event => {
   console.log('start click')
   gameMenu.style.opacity = 0
+  gameStatus.score = 0
   restartGame()
 }
 buttonData.onclick = event => {
@@ -33,10 +40,12 @@ buttonData.onclick = event => {
     gameStatus.gameRunning = false
     gameStatus.dataMenuOpened = true
     containerData.style.opacity = 1
+    gameMenu.style.opacity = 0
   } else {
     gameStatus.gameRunning = true
     gameStatus.dataMenuOpened = false
     containerData.style.opacity = 0
+    gameMenu.style.opacity = 1
   }
 }
 buttonPause.onclick = event => {
@@ -63,12 +72,11 @@ let plane
 // let plane = new Plane(scene)
 console.log(scene)
 // plane.plane.add(camera)
-// console.log(scene.remove(scene.getObjectByName( "plane" )))
-camera.position.z = 500
-camera.position.y = 200
-camera.rotation.x = -0.6
-// camera.position.z = 0
-// camera.position.y = 380
+
+camera.position.y = CAMERA_Y_GAME_OFF
+camera.position.z = CAMERA_Z_GAME_OFF
+camera.rotation.x = CAMERA_ROTATION_GAME_ON
+
 const start = () => {
   renderer.setAnimationLoop( () => {
     update()
@@ -84,26 +92,35 @@ const updateMenuInfos = () => {
   divAirplaneCondition.style.background = `rgb(${255 - plane.condition * 2.55}, ${plane.condition * 2.55}, 0)`
 }
 
+const checkLost = () => {
+  if (plane.condition <= 1) {
+    console.log("lost")
+    gameStatus.gameRunning = false
+    gameMenu.style.opacity = 1
+  }
+}
+
 let rollAngle = 0 // TODO: a mettre dans classe plane ?
 let pitchAngle = 0
 
 const restartGame = () => {
-  gameStatus.gameRunning = true
   gameStatus.score = 0
   scene.remove(scene.getObjectByName( "plane" ))
   plane = new Plane(scene)
+  gameStatus.gameRunning = true
 }
 
 const update = () => {
+  console.log(camera.rotation.x)
+  ambientLight.intensity += - ambientLight.intensity * 0.5
+  moveCamera()
+  tiltCamera(rollAngle) // TODO: voir utilite
   if (gameStatus.gameRunning === true) {
     let deltaTime = clock.getDelta()
 
     updateMenuInfos()
     world.moveWaves()
     world.rotate(plane, scene)
-    ambientLight.intensity += - ambientLight.intensity * 0.5
-    moveCamera()
-    tiltCamera(rollAngle) // TODO: voir utilite
     world.moveParticules(scene)
     plane.roll(rollAngle)
     plane.pitch(pitchAngle)
@@ -112,9 +129,20 @@ const update = () => {
     world.refillListDebris()
     plane.fuelCollisions(world, scene, ambientLight)
     world.refillListFuel()
+    checkLost()
 
     updateHandsPosition(deltaTime)
     recordData(leftHand, rightHand)
+  }
+
+  if (gameStatus.gameRunning === true) {
+    camera.position.y += (CAMERA_Y_GAME_ON - camera.position.y) * 0.01
+    camera.position.z += (CAMERA_Z_GAME_ON - camera.position.z) * 0.01
+    camera.rotation.x += (CAMERA_ROTATION_GAME_ON - camera.rotation.x) * 0.01
+  } else {
+    camera.position.y += (CAMERA_Y_GAME_OFF - camera.position.y) * 0.01
+    camera.position.z += (CAMERA_Z_GAME_OFF - camera.position.z) * 0.01
+    camera.rotation.x += (CAMERA_ROTATION_GAME_OFF - camera.rotation.x) * 0.01
   }
 
   if (gameStatus.dataMenuOpened === true) {
@@ -124,7 +152,6 @@ const update = () => {
 let timeLastUpdate = 0
 const updateHandsPosition = async deltaTime => {
   timeLastUpdate += deltaTime
-  console.log(timeLastUpdate)
   if (timeLastUpdate > 0.1) {
     timeLastUpdate = 0
     let pose = await estimatePoseOnImage()

@@ -337,10 +337,12 @@ class Plane {
   pitch = angle => {
     this.targetPitchAngle = - ((HEIGHT_VIDEO - Math.abs(angle)) / HEIGHT_VIDEO - 0.5) // Normalize in [-0.5, 0.5]
     // console.log(this.targetPitchAngle)
-    this.plane.rotation.x += (this.targetPitchAngle - this.plane.rotation.x) * 0.05
+    this.plane.rotation.x += (this.targetPitchAngle - this.plane.rotation.x) * 0.15
     let minAltitude = 50
     let maxAltitude = 150
     this.plane.position.y += this.plane.rotation.x
+    this.plane.position.y = Math.max(Math.min(this.plane.position.y, 150), 50)
+    // console.log(this.plane.position.y)
   }
 
   terrainCollisions = scene => {

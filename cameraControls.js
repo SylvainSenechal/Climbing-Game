@@ -21,13 +21,13 @@ document.onkeyup = event => {
 	if (event.keyCode == 83) down  = false
 	if (event.keyCode == 81) left  = false
 }
-// document.onmousemove = event => {
-// 	mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-// 	mouse.y = - (event.clientY / window.innerHeight) * 2 + 1
-// 	camera.rotateX(-event.movementY * 0.2 * Math.PI / 180)
-// 	camera.rotateY(-event.movementX * 0.2 * Math.PI / 180)
-// 	camera.rotation.z = 0
-// }
+document.onmousemove = event => {
+	mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+	mouse.y = - (event.clientY / window.innerHeight) * 2 + 1
+	camera.rotateX(-event.movementY * 0.2 * Math.PI / 180)
+	camera.rotateY(-event.movementX * 0.2 * Math.PI / 180)
+	camera.rotation.z = 0
+}
 
 const cameraMover = camera => {
   return () => {

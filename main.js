@@ -21,17 +21,31 @@ let gameMenu = document.getElementById("gameMenu")
 let buttonStart = document.getElementById("startGame")
 let buttonPause = document.getElementById("pause")
 let buttonData = document.getElementById("data")
+let containerData = document.getElementById("containerData")
 buttonStart.onclick = event => {
   console.log('start click')
-  gameMenu.style.display = "none"
+  gameMenu.style.opacity = 0
   restartGame()
 }
 buttonData.onclick = event => {
   console.log('click data')
-  gameStatus.gameRunning = false
-  gameStatus.dataMenuOpened = true
+  if (gameStatus.dataMenuOpened === false) {
+    gameStatus.gameRunning = false
+    gameStatus.dataMenuOpened = true
+    containerData.style.opacity = 1
+  } else {
+    gameStatus.gameRunning = true
+    gameStatus.dataMenuOpened = false
+    containerData.style.opacity = 0
+  }
 }
-buttonPause.onclick = event => gameStatus.gameRunning = !gameStatus.gameRunning
+buttonPause.onclick = event => {
+  if (gameStatus.gameRunning === true) {
+    gameStatus.gameRunning = false
+  } else {
+    gameStatus.gameRunning = true
+  }
+}
 
 let rightHand = {x: 0, y: 0}
 let leftHand = {x: 0, y: 0}
@@ -55,7 +69,6 @@ camera.position.y = 200
 camera.rotation.x = -0.6
 // camera.position.z = 0
 // camera.position.y = 380
-let cpt = 0
 const start = () => {
   renderer.setAnimationLoop( () => {
     update()
@@ -84,7 +97,6 @@ const restartGame = () => {
 const update = () => {
   if (gameStatus.gameRunning === true) {
     let deltaTime = clock.getDelta()
-    cpt ++
 
     updateMenuInfos()
     world.moveWaves()
@@ -101,7 +113,7 @@ const update = () => {
     plane.fuelCollisions(world, scene, ambientLight)
     world.refillListFuel()
 
-    updateHandsPosition()
+    updateHandsPosition(deltaTime)
     recordData(leftHand, rightHand)
   }
 
@@ -109,9 +121,12 @@ const update = () => {
     drawData()
   }
 }
-
-const updateHandsPosition = async () => {
-  if (cpt % 1 === 0) {
+let timeLastUpdate = 0
+const updateHandsPosition = async deltaTime => {
+  timeLastUpdate += deltaTime
+  console.log(timeLastUpdate)
+  if (timeLastUpdate > 0.1) {
+    timeLastUpdate = 0
     let pose = await estimatePoseOnImage()
 
     let threshold = 0.4

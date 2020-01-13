@@ -402,7 +402,7 @@ class Debris {
     this.mesh.translateOnAxis(new THREE.Vector3(- 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2).normalize(), altitude)
   }
 
-  static fillListDebris = (listDebris, nbDebris) => {
+  static fillListDebris(listDebris, nbDebris) {
     let nbNewDebris = nbDebris - listDebris.children.length
     for (let i = 0; i < nbNewDebris; i++) {
       listDebris.add(new Debris().mesh)
@@ -424,7 +424,7 @@ class Fuel {
     this.mesh.translateOnAxis(new THREE.Vector3(- 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2).normalize(), altitude)
     this.rotationDirection = new THREE.Vector3(-1 + 2 * Math.random(), -1 + 2 * Math.random(), -1 + 2 * Math.random())
   }
-  static fillListFuel = (listFuel, nbFuel) => {
+  static fillListFuel(listFuel, nbFuel) {
     let nbNewFuel = nbFuel - listFuel.children.length
     for (let i = 0; i < nbNewFuel; i++) {
       listFuel.add(new Fuel().mesh)

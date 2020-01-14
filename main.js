@@ -14,12 +14,13 @@ const gameStatus = {
   score: 0,
 }
 
-const CAMERA_Y_GAME_ON = 470
+const CAMERA_Y_GAME_ON = 460
 const CAMERA_Z_GAME_ON = 100
 const CAMERA_Y_GAME_OFF = 300
 const CAMERA_Z_GAME_OFF = 800
 const CAMERA_ROTATION_GAME_OFF = - 0.27
 const CAMERA_ROTATION_GAME_ON = - 0.7
+
 let divScore = document.getElementById("scoreValue")
 let divFuel = document.getElementById("fuelValue")
 let divAirplaneCondition = document.getElementById("sliderFront")
@@ -93,7 +94,7 @@ const updateMenuInfos = () => {
 }
 
 const checkLost = () => {
-  if (plane.condition <= 1) {
+  if (plane.condition <= 1 || plane.fuel < 0) {
     console.log("lost")
     gameStatus.gameRunning = false
     gameMenu.style.opacity = 1
@@ -111,7 +112,6 @@ const restartGame = () => {
 }
 
 const update = () => {
-  console.log(camera.rotation.x)
   ambientLight.intensity += - ambientLight.intensity * 0.5
   moveCamera()
   tiltCamera(rollAngle) // TODO: voir utilite
@@ -193,8 +193,8 @@ window.onresize = event => {
   renderer.setSize(window.innerWidth, window.innerHeight)
 }
 
-document.onclick = e => {
-  let elem = document.body
-  elem.requestPointerLock = elem.requestPointerLock || elem.mozRequestPointerLock
-  elem.requestPointerLock()
-}
+// document.onclick = e => {
+//   let elem = document.body
+//   elem.requestPointerLock = elem.requestPointerLock || elem.mozRequestPointerLock
+//   elem.requestPointerLock()
+// }

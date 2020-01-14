@@ -53,7 +53,7 @@ const estimatePoseOnImage = async () => {
     flipHorizontal: true,
     decodingMethod: 'single-person'
   })
-  drawPose(pose.keypoints)
+  // drawPose(pose.keypoints)
 
   return pose
 }

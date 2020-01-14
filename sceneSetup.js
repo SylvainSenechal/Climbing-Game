@@ -34,8 +34,8 @@ const init = () => {
   // light.shadow.top = 500
   // light.shadow.bottom = - 500
 
-  let helper = new THREE.DirectionalLightHelper(light, 5)
-  scene.add(helper)
+  // let helper = new THREE.DirectionalLightHelper(light, 5)
+  // scene.add(helper)
   // var helpeer = new THREE.CameraHelper( light.shadow.camera );
   // scene.add( helpeer );
   let ambientLight = new THREE.AmbientLight(0xf09c89, 0)

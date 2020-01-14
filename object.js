@@ -4,11 +4,12 @@ const SIZE_WORLD = 300
 const DETAILS_WORLD = 5
 const NB_CLOUDS = 200
 const OCTAVES = 3
-const NB_DEBRIS = 50
+const NB_DEBRIS = 40
 const COLLISION_DAMAGE = 19
 const NB_FUEL = 50
 const NB_PARTICULES_ON_EXPLOSION = 10
 const PARTICULES_LIFESPAN = 20
+const NATURAL_PLANE_PITCH = - 0.5
 
 class World {
   constructor(scene) {
@@ -45,16 +46,16 @@ class World {
     let angle = - plane.plane.rotation.z * 0.01
     let speed = 0.005
     this.terrain.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
-    this.terrain.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle)
+    this.terrain.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
 
     this.sky.clouds.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
-    this.sky.clouds.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle)
+    this.sky.clouds.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
 
     this.listDebris.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
-    this.listDebris.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle)
+    this.listDebris.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
 
     this.listFuel.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
-    this.listFuel.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle)
+    this.listFuel.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
 
     for (let particule of this.listParticules) {
       particule.pivot.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
@@ -277,7 +278,7 @@ class Sky {
       subCloud.rotateZ(Math.random() * 360 * Math.PI / 180)
       cloud.add(subCloud)
     }
-    let altitude = SIZE_WORLD * 1.5 + (2 * Math.random()) * SIZE_WORLD / 5
+    let altitude = SIZE_WORLD * 1.6 + (2 * Math.random()) * SIZE_WORLD / 5
     // cloud.position.y = altitude
     cloud.translateOnAxis(new THREE.Vector3(- 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2).normalize(), altitude)
 
@@ -294,55 +295,129 @@ class Plane {
     this.raycaster = new THREE.Raycaster()
     this.raycaster.near = 10
     this.raycaster.far = 50
-    let gPlane = new THREE.BoxGeometry(10, 10, 50)
-    let mPlane = new THREE.MeshStandardMaterial({
-      color: 0x333333,
-      side: THREE.DoubleSide,
-      flatShading: true,
-      roughness: 0.5,
-      metalness: 0.2,
-      // wireframe: true
-    })
-    let plane = new THREE.Mesh(gPlane, mPlane)
-    plane.position.z = 250 // SIZE_WORLD + 50
-    plane.position.y = 250
-    let mWings = new THREE.MeshStandardMaterial({
-      color: 0xff3333,
-      side: THREE.DoubleSide,
-      flatShading: true,
-      roughness: 0.5,
-      metalness: 0.2,
-      // wireframe: true
-    })
-    let gWings = new THREE.BoxGeometry(60, 2, 12)
-    let wings = new THREE.Mesh(gWings, mWings)
-    // wings.rotateY(90 * Math.PI / 180)
-    scene.add(plane)
-    plane.add(wings)
-    // plane.rotateY(90 * Math.PI / 180)repartition
-    this.plane = plane
-    this.plane.name = "plane"
 
+    let gCarlingue = new THREE.BoxGeometry(8, 8, 40)
+    let mCarlingue = new THREE.MeshStandardMaterial({
+      color: 0x222222,
+      side: THREE.DoubleSide,
+      flatShading: true,
+      roughness: 0.5,
+      metalness: 0.2,
+    })
+    gCarlingue.vertices[0].x -= 2.5
+    gCarlingue.vertices[0].y -= 2.5
+    gCarlingue.vertices[2].x -= 2.5
+    gCarlingue.vertices[2].y += 2.5
+    gCarlingue.vertices[5].x += 2.5
+    gCarlingue.vertices[5].y -= 2.5
+    gCarlingue.vertices[7].x += 2.5
+    gCarlingue.vertices[7].y += 2.5
+    let carlingue = new THREE.Mesh(gCarlingue, mCarlingue)
+    let gMotor = new THREE.BoxGeometry(8, 8, 5)
+    let mMotor =  new THREE.MeshStandardMaterial({
+      color: new THREE.Color('gainsboro'),// 0x333333,
+      side: THREE.DoubleSide,
+      flatShading: true,
+      roughness: 0.5,
+      metalness: 0.2,
+    })
+    let motor = new THREE.Mesh(gMotor, mMotor)
+    motor.position.z += - 20
+    let gHelice = new THREE.BoxGeometry(30, 2, 1)
+    let mHelice =  new THREE.MeshStandardMaterial({
+      color: new THREE.Color('peru'),// 0x333333,
+      side: THREE.DoubleSide,
+      flatShading: true,
+      roughness: 0.5,
+      metalness: 0.2,
+    })
+    this.helice1 = new THREE.Mesh(gHelice, mHelice)
+    this.helice2 = new THREE.Mesh(gHelice, mHelice)
+    this.helice1.position.z -= 25
+    this.helice2.position.z -= 25
+    this.helice2.rotateZ(90 * Math.PI / 180)
+    let gWings = new THREE.BoxGeometry(60, 1, 8)
+    let mWings = new THREE.MeshStandardMaterial({
+      color: 0x555555,
+      side: THREE.DoubleSide,
+      flatShading: true,
+      roughness: 0.5,
+      metalness: 0.2,
+    })
+    gWings.vertices[0].z -= 2.5
+    gWings.vertices[5].z -= 2.5
+    let wings = new THREE.Mesh(gWings, mWings)
+    wings.position.z -= 5
+    let gMiddleBack = new THREE.OctahedronGeometry(2.5, 1)
+    let mMiddleBack = new THREE.MeshStandardMaterial({
+      color: 0x555555,
+      side: THREE.DoubleSide,
+      flatShading: true,
+      roughness: 0.5,
+      metalness: 0.2,
+    })
+    let tail = new THREE.Mesh(gMiddleBack, mMiddleBack)
+    tail.position.z += 20
+    let gPitch = new THREE.BoxGeometry(20, 1, 6)
+    gPitch.vertices[0].z -= 1.5
+    gPitch.vertices[5].z -= 1.5
+    let mPitch = new THREE.MeshStandardMaterial({
+      color: 0x555555,
+      side: THREE.DoubleSide,
+      flatShading: true,
+      roughness: 0.5,
+      metalness: 0.2,
+    })
+    this.pitchControl = new THREE.Mesh(gPitch, mPitch)
+    this.pitchControl.position.z += 22
+    let gYaw = new THREE.BoxGeometry(10, 1, 6)
+    gYaw.vertices[0].y -= 0.4
+    gYaw.vertices[5].y -= 0.4
+    gYaw.vertices[2].y += 0.4
+    gYaw.vertices[7].y += 0.4
+    let mYaw = new THREE.MeshStandardMaterial({
+      color: 0x555555,
+      side: THREE.DoubleSide,
+      flatShading: true,
+      roughness: 0.5,
+      metalness: 0.2,
+    })
+    this.yawControl = new THREE.Mesh(gYaw, mYaw)
+    this.yawControl.position.z += 22
+    this.yawControl.position.y += 2
+    this.yawControl.rotateZ(90 * Math.PI / 180)
+    scene.add(carlingue)
+    carlingue.add(wings)
+    carlingue.add(motor)
+    carlingue.add(this.helice1)
+    carlingue.add(this.helice2)
+    carlingue.add(tail)
+    carlingue.add(this.pitchControl)
+    carlingue.add(this.yawControl)
+
+    this.plane = carlingue
+    this.plane.name = "plane"
+    carlingue.position.y = 250
+    carlingue.position.z = 0 // 700
+    carlingue.rotation.x = NATURAL_PLANE_PITCH
     this.raycaster.set(this.plane.position, new THREE.Vector3(0, -1, 0))
   }
 
   roll = angle => {
     this.targetRollAngle = - angle
-    // this.plane.rotateX(angle * Math.PI / 180)
-    // this.plane.rotation.x += angle * 0.01
     this.plane.rotation.z += (this.targetRollAngle - this.plane.rotation.z) * 0.05
-    // console.log(this.plane.rotation.x)
+    this.helice1.rotateZ(0.1)
+    this.helice2.rotateZ(0.1)
   }
 
   pitch = angle => {
-    this.targetPitchAngle = - ((HEIGHT_VIDEO - Math.abs(angle)) / HEIGHT_VIDEO - 0.5) // Normalize in [-0.5, 0.5]
-    // console.log(this.targetPitchAngle)
+    this.targetPitchAngle = - ((HEIGHT_VIDEO - Math.abs(angle + NATURAL_PLANE_PITCH)) / HEIGHT_VIDEO - 0.5) + NATURAL_PLANE_PITCH// Normalize in [-0.5, 0.5]
     this.plane.rotation.x += (this.targetPitchAngle - this.plane.rotation.x) * 0.15
-    let minAltitude = 50
-    let maxAltitude = 150
-    this.plane.position.y += this.plane.rotation.x
-    this.plane.position.y = Math.max(Math.min(this.plane.position.y, 150), 50)
-    // console.log(this.plane.position.y)
+    let minAltitude = 300
+    let maxAltitude = 440
+    this.plane.position.y += (this.plane.rotation.x - NATURAL_PLANE_PITCH) * 1.5
+    this.plane.position.y = Math.max(Math.min(this.plane.position.y, maxAltitude), minAltitude)
+    this.pitchControl.rotation.x += (- ((this.targetPitchAngle - NATURAL_PLANE_PITCH) * 2.5) - this.pitchControl.rotation.x) * 0.15
   }
 
   terrainCollisions = scene => {
@@ -363,7 +438,7 @@ class Plane {
       let debrisPosition = new THREE.Vector3()
       debris.getWorldPosition(debrisPosition)
       let distance = debrisPosition.distanceTo(this.plane.position)
-      if (distance < 150) {
+      if (distance < 60) {
         this.condition = Math.max(this.condition - COLLISION_DAMAGE, 1)
         for (let i = 0; i < NB_PARTICULES_ON_EXPLOSION; i++) {
           world.listParticules.push(new Particule(scene, debrisPosition, "debris"))
@@ -379,8 +454,8 @@ class Plane {
       let fuelPosition = new THREE.Vector3()
       fuel.getWorldPosition(fuelPosition)
       let distance = fuelPosition.distanceTo(this.plane.position)
-      if (distance < 150) {
-        this.fuel += 300
+      if (distance < 80) {
+        this.fuel += 150
         for (let i = 0; i < NB_PARTICULES_ON_EXPLOSION; i++) {
           world.listParticules.push(new Particule(scene, fuelPosition, "fuel"))
         }
@@ -399,7 +474,7 @@ class Debris {
       metalness: 0.2,
     })
     let geometryDebris = new THREE.IcosahedronGeometry(SIZE_WORLD / 25, 1)
-    let altitude = SIZE_WORLD * 1.5 + (- 0.5 + 2 * Math.random()) * SIZE_WORLD / 2
+    let altitude = SIZE_WORLD * 1.3 + (- 1 + 2 * Math.random()) * SIZE_WORLD / 6
     this.mesh = new THREE.Mesh(geometryDebris, materialDebris)
     this.mesh.translateOnAxis(new THREE.Vector3(- 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2).normalize(), altitude)
   }
@@ -421,7 +496,7 @@ class Fuel {
       metalness: 0.2,
     })
     let geometryFuel = new THREE.TorusGeometry(SIZE_WORLD / 35, 2, 8, 12, Math.PI * 2)//(SIZE_WORLD / 35, 0)
-    let altitude = SIZE_WORLD * 1.5 + (- 0.5 + 2 * Math.random()) * SIZE_WORLD / 2
+    let altitude = SIZE_WORLD * 1.3 + (- 1 + 2 * Math.random()) * SIZE_WORLD / 6
     this.mesh = new THREE.Mesh(geometryFuel, materalFuel)
     this.mesh.translateOnAxis(new THREE.Vector3(- 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2).normalize(), altitude)
     this.rotationDirection = new THREE.Vector3(-1 + 2 * Math.random(), -1 + 2 * Math.random(), -1 + 2 * Math.random())

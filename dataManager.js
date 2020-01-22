@@ -62,8 +62,7 @@ const drawData = () => {
       ctxData.fillRect(1 + i * SIZE_CASE, 1 + j * SIZE_CASE, SIZE_CASE - 1, SIZE_CASE - 1)
     }
   }
-  console.log(leftAverageX / nbData)
-  console.log(leftAverageY / nbData)
+
   ctxData.fillStyle = "#0000ff"
   ctxData.beginPath()
   ctxData.arc(leftAverageX / nbData, leftAverageY / nbData, 8, 0, 2*Math.PI)

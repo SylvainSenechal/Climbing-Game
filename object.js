@@ -44,22 +44,28 @@ class World {
 
   rotate = (plane, scene) => {
     let angle = - plane.plane.rotation.z * 0.01
+    let angle2 = - plane.plane.rotation.y * 0.01
     let speed = 0.005
     this.terrain.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
     this.terrain.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
+    this.terrain.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle2)
 
     this.sky.clouds.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
     this.sky.clouds.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
+    this.sky.clouds.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle2)
 
     this.listDebris.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
     this.listDebris.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
+    this.listDebris.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle2)
 
     this.listFuel.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
     this.listFuel.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
+    this.listFuel.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle2)
 
     for (let particule of this.listParticules) {
       particule.pivot.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), speed)
-      particule.pivot.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle)
+      particule.pivot.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angle)
+      particule.pivot.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), angle2)
     }
     for (let fuel of this.listFuel.children) {
       fuel.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Math.random() * 0.02)
@@ -292,6 +298,7 @@ class Plane {
     this.fuel = 1000
     this.targetRollAngle = 0
     this.targetPitchAngle = 0
+    this.targetYawAngle = 0
     this.raycaster = new THREE.Raycaster()
     this.raycaster.near = 10
     this.raycaster.far = 50
@@ -420,6 +427,17 @@ class Plane {
     this.pitchControl.rotation.x += (- ((this.targetPitchAngle - NATURAL_PLANE_PITCH) * 2.5) - this.pitchControl.rotation.x) * 0.15
   }
 
+  yaw = angle => {
+    if (angle > 0) {
+      angle = Math.max(0, angle - 0.2)
+    } else {
+      angle = Math.min(0, angle + 0.2)
+    }
+    this.targetYawAngle = - angle
+    this.plane.rotation.y += (this.targetYawAngle - this.plane.rotation.y) * 0.05
+    this.yawControl.rotation.y += (- this.targetYawAngle - this.yawControl.rotation.y) * 0.15
+  }
+
   terrainCollisions = scene => {
     let intersected = this.raycaster.intersectObjects(scene.children, true)
     for (let i = 0; i < intersected.length; i++) {
@@ -455,7 +473,7 @@ class Plane {
       fuel.getWorldPosition(fuelPosition)
       let distance = fuelPosition.distanceTo(this.plane.position)
       if (distance < 70) {
-        this.fuel += 150
+        this.fuel += 200
         for (let i = 0; i < NB_PARTICULES_ON_EXPLOSION; i++) {
           world.listParticules.push(new Particule(scene, fuelPosition, "fuel"))
         }

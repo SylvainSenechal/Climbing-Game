@@ -63,7 +63,10 @@ let targetRightHandX = 840
 let targetRightHandY = 360
 let targetLeftHandX = 440
 let targetLeftHandY = 360
-
+let rightEar = {x: 840, y: 360}
+let leftEar = {x: 840, y: 360}
+let targetRightEar = {x: 840, y: 360}
+let targetLeftEar = {x: 840, y: 360}
 const clock = new THREE.Clock()
 
 window.camera = camera
@@ -103,6 +106,7 @@ const checkLost = () => {
 
 let rollAngle = 0 // TODO: a mettre dans classe plane ?
 let pitchAngle = 0
+let yawAngle = 0
 
 const restartGame = () => {
   gameStatus.score = 0
@@ -124,6 +128,7 @@ const update = () => {
     world.moveParticules(scene)
     plane.roll(rollAngle)
     plane.pitch(pitchAngle)
+    plane.yaw(yawAngle)
     plane.terrainCollisions(scene)
     plane.debrisCollisions(world, scene, ambientLight)
     world.refillListDebris()
@@ -165,6 +170,14 @@ const updateHandsPosition = async deltaTime => {
       targetLeftHandX = pose.keypoints[9].position.x
       targetLeftHandY = - pose.keypoints[9].position.y
     }
+    if (pose.keypoints[4].score > threshold) {
+      targetRightEar.x = pose.keypoints[4].position.x
+      targetRightEar.y = - pose.keypoints[4].position.y
+    }
+    if (pose.keypoints[3].score > threshold) {
+      targetLeftEar.x = pose.keypoints[3].position.x
+      targetLeftEar.y = - pose.keypoints[3].position.y
+    }
   }
   let coil = 0.1
 
@@ -181,6 +194,19 @@ const updateHandsPosition = async deltaTime => {
     rollAngle = 0
   }
   if (rightHand.y < leftHand.y) rollAngle = - rollAngle
+
+  rightEar.x += (targetRightEar.x - rightEar.x) * coil
+  rightEar.y += (targetRightEar.y - rightEar.y) * coil
+  leftEar.x += (targetLeftEar.x - leftEar.x) * coil
+  leftEar.y += (targetLeftEar.y - leftEar.y) * coil
+  dst = Math.sqrt((rightEar.x - leftEar.x)*(rightEar.x - leftEar.x) + (rightEar.y - leftEar.y)*(rightEar.y - leftEar.y))
+  dst2 = rightEar.x - leftEar.x
+  if (dst > dst2) {
+    yawAngle = - Math.acos(dst2 / dst)
+  } else {
+    yawAngle = 0
+  }
+  if (rightEar.y < leftEar.y) yawAngle = - yawAngle
 }
 
 startCamera()

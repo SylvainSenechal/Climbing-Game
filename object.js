@@ -438,7 +438,7 @@ class Plane {
       let debrisPosition = new THREE.Vector3()
       debris.getWorldPosition(debrisPosition)
       let distance = debrisPosition.distanceTo(this.plane.position)
-      if (distance < 60) {
+      if (distance < 50) {
         this.condition = Math.max(this.condition - COLLISION_DAMAGE, 1)
         for (let i = 0; i < NB_PARTICULES_ON_EXPLOSION; i++) {
           world.listParticules.push(new Particule(scene, debrisPosition, "debris"))
@@ -454,7 +454,7 @@ class Plane {
       let fuelPosition = new THREE.Vector3()
       fuel.getWorldPosition(fuelPosition)
       let distance = fuelPosition.distanceTo(this.plane.position)
-      if (distance < 80) {
+      if (distance < 70) {
         this.fuel += 150
         for (let i = 0; i < NB_PARTICULES_ON_EXPLOSION; i++) {
           world.listParticules.push(new Particule(scene, fuelPosition, "fuel"))

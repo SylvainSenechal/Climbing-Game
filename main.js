@@ -57,12 +57,12 @@ buttonPause.onclick = event => {
   }
 }
 
-let rightHand = {x: 0, y: 0}
-let leftHand = {x: 0, y: 0}
-let targetRightHandX = 0
-let targetRightHandY = 0
-let targetLeftHandX = 0
-let targetLeftHandY = 0
+let rightHand = {x: 840, y: 360}
+let leftHand = {x: 440, y: 360}
+let targetRightHandX = 840
+let targetRightHandY = 360
+let targetLeftHandX = 440
+let targetLeftHandY = 360
 
 const clock = new THREE.Clock()
 

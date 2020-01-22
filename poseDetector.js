@@ -3,7 +3,7 @@ let target = 0
 
 let poseNetModel
 let video
-const WIDTH_VIDEO = 1280
+export const WIDTH_VIDEO = 1280
 export const HEIGHT_VIDEO = 720
 
 const startCamera = () => {
